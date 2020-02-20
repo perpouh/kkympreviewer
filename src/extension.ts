@@ -1,21 +1,7 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { window, TextDocument } from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "kkymwriter" is now active!');
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand('extension.kkymwriter.preview', () => {
-    // Create and show panel
     const panel = vscode.window.createWebviewPanel(
       'catCoding',
       'プレビュー',
@@ -23,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
       {}
     );
     // Try preview when this extension is activated the first time
-    let editor = window.activeTextEditor;
+    let editor = vscode.window.activeTextEditor;
     if (!editor) {
       return;
     }
@@ -63,7 +49,7 @@ function convertToHtml(txt: string) {
     });
 }
 
-function getWebviewContent(doc: TextDocument) {
+function getWebviewContent(doc: vscode.TextDocument) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

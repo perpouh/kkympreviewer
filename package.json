@@ -10,20 +10,20 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.kkymwriter.preview"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "extension.kkymwriter.preview",
-				"title": "カクヨム記法でプレビュー"
+				"title": "カクヨム記法プレビュー"
 			}
 		],
 		"markdown.previewStyles": [
 			"./style.css"
 		],
-    "markdown.markdownItPlugins": true
+		"markdown.markdownItPlugins": true
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
