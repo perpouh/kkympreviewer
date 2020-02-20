@@ -15,40 +15,35 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand('extension.kkymwriter.preview', () => {
-      // Create and show panel
-      const panel = vscode.window.createWebviewPanel(
-        'catCoding',
-        'Cat Coding',
-        vscode.ViewColumn.Two,
-        {}
-      );
+    // Create and show panel
+    const panel = vscode.window.createWebviewPanel(
+      'catCoding',
+      'プレビュー',
+      vscode.ViewColumn.Two,
+      {}
+    );
+    // Try preview when this extension is activated the first time
+    let editor = window.activeTextEditor;
+    if (!editor) {
+      return;
+    }
+    // editor.addEventListener()
+    let doc = editor.document;
+    panel.webview.html = getWebviewContent(doc);
 
-      let editor = window.activeTextEditor;
-      if(!editor) {
-        return;
-      }
-      // editor.addEventListener()
-      let doc = editor.document;
-      panel.webview.html = getWebviewContent(doc);
+    vscode.workspace.onDidChangeTextDocument(event => {
+      panel.webview.html = getWebviewContent(event.document);
+    });
   });
 
   context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
 
-function getWebviewContent(doc: TextDocument) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Coding</title>
-</head>
-<body>
-    ` + 
-    doc.getText().replace(/\n/g, "<br />")
+function convertToHtml(txt: string) {
+  return txt.replace(/\n/g, "<br />")
     .replace(/[\|｜](.+?)《(.+?)》/g, '<ruby>$1<rt>$2</rt></ruby>')
     .replace(/[\|｜](.+?)（(.+?)）/g, '<ruby>$1<rt>$2</rt></ruby>')
     .replace(/[\|｜](.+?)\((.+?)\)/g, '<ruby>$1<rt>$2</rt></ruby>')
@@ -60,7 +55,25 @@ function getWebviewContent(doc: TextDocument) {
     /* 括弧を括弧のまま表示したい場合は、括弧の直前に縦棒を入力します。 */
     .replace(/[\|｜]《(.+?)》/g, '《$1》')
     .replace(/[\|｜]（(.+?)）/g, '（$1）')
-    .replace(/[\|｜]\((.+?)\)/g, '($1)') 
+    .replace(/[\|｜]\((.+?)\)/g, '($1)')
+    /* 二重山括弧内を傍点付き文字列に変換する */
+    .replace(/《《(.+?)》》/g, function (match, p1, offset, string) {
+      var boten = "﹅".repeat(p1.length);
+      return "<ruby>" +p1+ "<rt>" + boten + "</rt></ruby>";
+    });
+}
+
+function getWebviewContent(doc: TextDocument) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Coding</title>
+</head>
+<body>
+    ` +
+    convertToHtml(doc.getText())
     + `
 </body>
 </html>`;
