@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 
+let panel: vscode.WebviewPanel;
+
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand('extension.kkymwriter.preview', () => {
-    const panel = vscode.window.createWebviewPanel(
+    panel = vscode.window.createWebviewPanel(
       'catCoding',
       'プレビュー',
       vscode.ViewColumn.Two,
@@ -23,6 +25,14 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(disposable);
+
+  vscode.window.onDidChangeActiveTextEditor(editor => {
+    if (!editor) {
+      return;
+    }
+    let doc = editor.document;
+    panel.webview.html = getWebviewContent(doc);
+  });
 }
 
 // this method is called when your extension is deactivated
